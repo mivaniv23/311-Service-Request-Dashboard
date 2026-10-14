@@ -42,10 +42,10 @@ if filtered_df.empty:
     st.warning("No requests were found for the selected dates.")
     st.stop()
 
-# Simple summary metrics
+# Summary metrics
 total_requests = len(filtered_df)
-closed_requests = filtered_df["status"].astype(str).str.lower().eq("closed").sum()
-open_requests = filtered_df["status"].astype(str).str.lower().eq("open").sum()
+closed_requests = filtered_df["status"].astype(str).str.strip().str.lower().eq("closed").sum()
+open_requests = filtered_df["status"].astype(str).str.strip().str.lower().eq("open").sum()
 average_resolution = filtered_df["resolution_days"].dropna().mean()
 
 m1, m2, m3, m4 = st.columns(4)
@@ -80,3 +80,28 @@ ax2.set_ylabel("Number of Requests")
 fig2.tight_layout()
 st.pyplot(fig2)
 plt.close(fig2)
+
+# Chart 3: requests by status
+st.subheader("Requests by Status")
+status_counts = filtered_df["status"].fillna("Unknown").value_counts()
+fig3, ax3 = plt.subplots(figsize=(7, 4))
+status_counts.plot(kind="bar", ax=ax3)
+ax3.set_xlabel("Status")
+ax3.set_ylabel("Number of Requests")
+fig3.tight_layout()
+st.pyplot(fig3)
+plt.close(fig3)
+
+# Chart 4: resolution times
+st.subheader("Resolution Times")
+resolution_data = filtered_df["resolution_days"].dropna()
+if resolution_data.empty:
+    st.info("No resolution-time data is available for the selected dates.")
+else:
+    fig4, ax4 = plt.subplots(figsize=(8, 4))
+    resolution_data.plot(kind="hist", bins=30, ax=ax4, edgecolor="black")
+    ax4.set_xlabel("Resolution Time (days)")
+    ax4.set_ylabel("Number of Requests")
+    fig4.tight_layout()
+    st.pyplot(fig4)
+    plt.close(fig4)
